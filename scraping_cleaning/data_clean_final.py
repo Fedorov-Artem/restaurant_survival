@@ -24,6 +24,7 @@ df.loc[df['last_update'] == ', 2023', 'last_update'] = np.NaN
 
 df['fb_last_update_year'] = df['last_update'].apply(lambda x: str(x).split(', ')[1] if ", " in str(x) else 0)
 df['fb_last_update_year'] = df['fb_last_update_year'].astype(np.int16)
+df = df.rename(columns={'last_update':'fb_last_update'})
 
 # Change status for restaurants that are marked as permanently closed on their Facebook page.
 df.loc[(df['status'] == 'in rating') & (df['description'].str.contains('Permanently Closed', na=False)), 'status'] = 'fb_closed'
