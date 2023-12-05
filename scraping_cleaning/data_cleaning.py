@@ -1,4 +1,4 @@
-# Clean the data, obtained by restaurant_soap.py script
+# Clean the data, obtained by restaurant_by_id.py script
 
 import numpy as np
 import pandas as pd
