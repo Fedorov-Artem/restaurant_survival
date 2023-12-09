@@ -21,8 +21,7 @@ app = dash.Dash(
 app.title = "Tripadvisor restaurants NI"
 server = app.server
 
-#df = pd.read_csv('csv_old_clean/NI_joined.csv')
-df = pd.read_csv('TA_restaurants_joined_nov.csv')
+df = pd.read_csv('TA_restaurants_joined.csv')
 #filter out records with coordinates outside NI
 df = df.loc[(df['latitude'] > 54) & (df['longitude'] < -5.4) ]
 
@@ -35,8 +34,8 @@ for i in range(len(df)):
 
 geo_data = dlx.dicts_to_geojson(restaurants)
 color_options = [{"label": "Color by Tripadvisor Status", "value": "status"},
-                 {"label": "Color by Claimed status", "value": "claimed"},
-                 {"label": "Color by Review Activity", "value": "is_active"},
+                 {"label": "Color by Claimed Status", "value": "claimed"},
+                 {"label": "Color by Website Status", "value": "website_status"},
                  {"label": "Color by Price Level", "value": "price_level"}]
 
 status_options = [{"label": "In Rating", "value": "in rating"},
@@ -48,10 +47,10 @@ claimed_options = [{"label": "Claimed", "value": "Claimed"},
                    {"label": "Unclaimed", "value": "Unclaimed"},
                    {"label": "Both Claimed and Unclaimed", "value": "All"}]
 
-active_options = [{"label": "Long Inactive", "value": "long_inactive"},
-                  {"label": "Recently Inactive", "value": "recently_inactive"},
-                  {"label": "Active", "value": "active"},
-                  {"label": "Both Active and Inactive", "value": "All"}]
+website_status_options = [{"label": "Online Website", "value": "online"},
+                          {"label": "Unavailable Website", "value": "unavailable"},
+                          {"label": "No Website", "value": "no_website"},
+                          {"label": "Any Website", "value": "All"}]
 
 price_level_options = [{"label": "No data", "value": "No data"},
                        {"label": "€", "value": "€"},
@@ -102,8 +101,8 @@ def generate_bar_charts(df_all, df_sel):
     fig = make_subplots(rows=1, cols=4, shared_yaxes=True)
     fig.append_trace(generate_bar(df_all, 'status', '#0d0887', 'All Restaurants'), 1, 1)
     fig.append_trace(generate_bar(df_sel, 'status', 'lightsalmon', 'Filtered Restaurants'), 1, 1)
-    fig.append_trace(generate_bar(df_all, 'is_active', '#0d0887'), 1, 2)
-    fig.append_trace(generate_bar(df_sel, 'is_active', 'lightsalmon'), 1, 2)
+    fig.append_trace(generate_bar(df_all, 'website_status', '#0d0887'), 1, 2)
+    fig.append_trace(generate_bar(df_sel, 'website_status', 'lightsalmon'), 1, 2)
     fig.append_trace(generate_bar(df_all, 'claimed', '#0d0887'), 1, 3)
     fig.append_trace(generate_bar(df_sel, 'claimed', 'lightsalmon'), 1, 3)
     fig.append_trace(generate_bar(df_all, 'price_level', '#0d0887'), 1, 4)
@@ -183,8 +182,8 @@ app.layout = html.Div(
                                     children=[
                                         # Dropdown to select times
                                         dcc.Dropdown(
-                                            id="active-dropdown",
-                                            options=active_options,
+                                            id="website-dropdown",
+                                            options=website_status_options,
                                             value="All",
                                         )
                                     ],
@@ -319,7 +318,7 @@ app.layout = html.Div(
         Input("color-dropdown", "value"),
         Input("status-dropdown", "value"),
         Input("claimed-dropdown", "value"),
-        Input("active-dropdown", "value"),
+        Input("website-dropdown", "value"),
         Input("price-level-dropdown", "value"),
         Input("checkbox-rating-na", "value"),
         Input("user-rating-slider", "value"),
@@ -329,7 +328,7 @@ app.layout = html.Div(
         Input("gluten-free-dropdown", "value"),
     ],
 )
-def filter_df(color_by, status, claimed, is_active, price_level, rating_checkbox, user_rating, total_reviews,
+def filter_df(color_by, status, claimed, website_status, price_level, rating_checkbox, user_rating, total_reviews,
               vegetarian, vegan, gluten_free):
     if claimed != 'All':
         df_selected = df.loc[df['claimed'] == claimed]
@@ -339,8 +338,8 @@ def filter_df(color_by, status, claimed, is_active, price_level, rating_checkbox
     if status != 'All':
         df_selected = df_selected.loc[df_selected['status'] == status]
 
-    if is_active != 'All':
-        df_selected = df_selected.loc[df_selected['is_active'] == is_active]
+    if website_status != 'All':
+        df_selected = df_selected.loc[df_selected['website_status'] == website_status]
 
     if price_level != 'All':
         df_selected = df_selected.loc[df_selected['price_level'] == price_level]
@@ -375,8 +374,8 @@ def filter_df(color_by, status, claimed, is_active, price_level, rating_checkbox
 
     if color_by == 'status':
         df_selected['color'] = df_selected['status'].map({'in rating': 'green', 'closed': 'red', 'redirect': 'yellow'})
-    elif color_by == 'is_active':
-        df_selected['color'] = df_selected['is_active'].map({'long_inactive': 'red', 'recently_inactive': 'yellow', 'active': 'green'})
+    elif color_by == 'website_status':
+        df_selected['color'] = df_selected['website_status'].map({'unavailable': 'red', 'no_website': 'yellow', 'online': 'green'})
     elif color_by == 'claimed':
         df_selected['color'] = df_selected['claimed'].map({'Unclaimed': 'red', 'Claimed': 'green'})
     elif color_by =='price_level':
