@@ -360,12 +360,6 @@ def filter_df(color_by, status, claimed, website_status, price_level, rating_che
         df_selected = df_selected.loc[df_selected['avg_rating'] >= user_rating[0]]
         df_selected = df_selected.loc[df_selected['avg_rating'] <= user_rating[1]]
 
-    #if total_reviews[1] == 1000:
-    #    df_selected = df_selected.loc[df_selected['total_reviews_count'] >= total_reviews[0]]
-    #else:
-    #    df_selected = df_selected.loc[df_selected['total_reviews_count'] >= total_reviews[0]]
-    #    df_selected = df_selected.loc[df_selected['total_reviews_count'] <= total_reviews[1]]
-
     if total_reviews[1] == 3:
         df_selected = df_selected.loc[df_selected['total_reviews_count'] >= scale_value(total_reviews[0])]
     else:
