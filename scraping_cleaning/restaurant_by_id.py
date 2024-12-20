@@ -61,9 +61,10 @@ def scrapeRestaurantInfo(restr_id):
     # Create the url and load the webpage
     start_string = "https://www.tripadvisor.com/Restaurant_Review-"
     restr_url = start_string + restr_id
-    options = webdriver.chrome.options.Options()
-    options.add_argument("--headless")
-    driver = webdriver.Chrome(options=options)
+    #options = webdriver.chrome.options.Options()
+    #options.add_argument("--headless")
+    #driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome()
     driver.get(restr_url)
 
     # Make a list to store properties
